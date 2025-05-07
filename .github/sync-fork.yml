@@ -9,18 +9,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Forked Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Add Upstream Remote
-        run: git remote add upstream https://github.com/gradle/actions.git
-
-      - name: Fetch Upstream Changes
-        run: git fetch upstream
+      - name: Fetch Upstream Remote
+        run: |
+          git remote add upstream https://github.com/gradle/actions.git
+          git fetch upstream
 
       - name: Create and Push Branch 
         run: |
-          git checkout -b weekly-sync-branch origin/weekly-sync-branch
+          git checkout -B weekly-sync-branch origin/weekly-sync-branch
           git merge upstream/weekly-sync-branch
           git push origin weekly-sync-branch
+
+      - name: Create Pull Request
+        run: gh pr create -B main -H weekly-sync-branch --title 'Sync Fork with Upstream' --body 'Weekly Cron. Created by GitHub Actions.'
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
