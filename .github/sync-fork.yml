@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Fetch Upstream Remote
         run: |
@@ -20,11 +21,18 @@ jobs:
 
       - name: Create and Push Branch 
         run: |
-          git checkout -B weekly-sync-branch origin/weekly-sync-branch
-          git merge upstream/weekly-sync-branch
-          git push origin weekly-sync-branch
+          git config user.email "github-action@users.noreply.github.com"
+          git config user.name "GitHub Actions"
+          
+          git checkout -B weekly-sync-branch
+          git merge upstream/main
+          git reset -- /home/runner/work/actions/gradle-dependency-submission-action/.github
+          
+          git push --set-upstream origin weekly-sync-branch
 
       - name: Create Pull Request
-        run: gh pr create -B main -H weekly-sync-branch --title 'Sync Fork with Upstream' --body 'Weekly Cron. Created by GitHub Actions.'
+        run: |
+          gh repo set-default actions/gradle-dependency-submission-action.rb
+          gh pr create -B main -H weekly-sync-branch --title 'Sync Fork with Upstream' --body 'Weekly Cron. Created by GitHub Actions.'
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
