@@ -19,20 +19,13 @@ jobs:
           git remote add upstream https://github.com/gradle/actions.git
           git fetch upstream
 
-      - name: Create and Push Branch 
+      - name: Merge Upstream `main` 
         run: |
           git config user.email "github-action@users.noreply.github.com"
           git config user.name "GitHub Actions"
           
-          git checkout -B weekly-sync-branch
-          git merge upstream/main
-          git reset -- /home/runner/work/actions/gradle-dependency-submission-action/.github
-          
-          git push --set-upstream origin weekly-sync-branch
-
-      - name: Create Pull Request
-        run: |
-          gh repo set-default actions/gradle-dependency-submission-action.rb
-          gh pr create -B main -H weekly-sync-branch --title 'Sync Fork with Upstream' --body 'Weekly Cron. Created by GitHub Actions.'
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git checkout main
+          git merge upstream/main --no-commit
+          git reset -- ./.github
+          git commit -m "Merge in upstream/main"
+          git push
