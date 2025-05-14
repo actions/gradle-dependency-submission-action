@@ -217,6 +217,8 @@ async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGr
     const jsonObject = JSON.parse(jsonContent)
     jsonObject.owner = github.context.repo.owner
     jsonObject.repo = github.context.repo.repo
+    core.info(`Detector name from "${jsonObject.detector.name}"`)
+    core.info(`snapshot before "${jsonObject}"`)
 
     // Override detector name if provided
     if (config && config.getDetectorName()) {
@@ -226,6 +228,9 @@ async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGr
             jsonObject.detector.name = detectorName
         }
     }
+    core.info(`Detector name from "${jsonObject.detector.name}"`)
+    core.info(`snapshot before "${jsonObject}"`)
+    core.info(`snapshot after "${jsonObject}"`)
 
     const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', jsonObject)
 
