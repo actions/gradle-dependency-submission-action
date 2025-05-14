@@ -93,7 +93,7 @@ async function findAndSubmitDependencyGraphs(config: DependencyGraphConfig, uplo
 
     const dependencyGraphFiles = await findDependencyGraphFiles()
     try {
-        await submitDependencyGraphs(dependencyGraphFiles)
+        await submitDependencyGraphs(dependencyGraphFiles, config)
     } catch (e) {
         try {
             await uploadDependencyGraphs(dependencyGraphFiles, config)
@@ -180,7 +180,7 @@ async function uploadDependencyGraphs(dependencyGraphFiles: string[], config: De
     }
 }
 
-async function submitDependencyGraphs(dependencyGraphFiles: string[]): Promise<void> {
+async function submitDependencyGraphs(dependencyGraphFiles: string[], config?: DependencyGraphConfig): Promise<void> {
     if (dependencyGraphFiles.length === 0) {
         core.info('No dependency graph files found to submit.')
         return
@@ -188,7 +188,7 @@ async function submitDependencyGraphs(dependencyGraphFiles: string[]): Promise<v
 
     for (const dependencyGraphFile of dependencyGraphFiles) {
         try {
-            await submitDependencyGraphFile(dependencyGraphFile)
+            await submitDependencyGraphFile(dependencyGraphFile, config)
         } catch (error) {
             if (error instanceof Error && error.name === 'HttpError') {
                 error.message = translateErrorMessage(dependencyGraphFile, error)
@@ -210,13 +210,23 @@ Note that this permission is never available for a 'pull_request' trigger from a
     return mainWarning
 }
 
-async function submitDependencyGraphFile(jsonFile: string): Promise<void> {
+async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGraphConfig): Promise<void> {
     const octokit = getOctokit()
     const jsonContent = fs.readFileSync(jsonFile, 'utf8')
 
     const jsonObject = JSON.parse(jsonContent)
     jsonObject.owner = github.context.repo.owner
     jsonObject.repo = github.context.repo.repo
+
+    // Override detector name if provided
+    if (config && config.getDetectorName()) {
+        const detectorName = config.getDetectorName()
+        if (jsonObject.detector && detectorName) {
+            core.info(`Overriding detector name from "${jsonObject.detector.name}" to "${detectorName}"`)
+            jsonObject.detector.name = detectorName
+        }
+    }
+
     const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', jsonObject)
 
     const relativeJsonFile = getRelativePathFromWorkspace(jsonFile)
