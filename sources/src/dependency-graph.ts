@@ -217,26 +217,43 @@ async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGr
     const jsonObject = JSON.parse(jsonContent)
     jsonObject.owner = github.context.repo.owner
     jsonObject.repo = github.context.repo.repo
-    core.info(`Detector name from "${jsonObject.detector.name}"`)
-    core.info(`snapshot before "${jsonObject}"`)
 
-    // Override detector name if provided
-    if (config && config.getDetectorName()) {
-        const detectorName = config.getDetectorName()
-        if (jsonObject.detector && detectorName) {
-            core.info(`Overriding detector name from "${jsonObject.detector.name}" to "${detectorName}"`)
-            jsonObject.detector.name = detectorName
+    // Override detector fields if provided
+    if (config && jsonObject.detector) {
+        // Override detector name
+        if (config.getDetectorName()) {
+            const detectorName = config.getDetectorName()
+            if (detectorName) {
+                core.info(`Overriding detector name from "${jsonObject.detector.name}" to "${detectorName}"`)
+                jsonObject.detector.name = detectorName
+            }
+        }
+
+        // Override detector version
+        if (config.getDetectorVersion()) {
+            const detectorVersion = config.getDetectorVersion()
+            if (detectorVersion) {
+                core.info(`Overriding detector version from "${jsonObject.detector.version}" to "${detectorVersion}"`)
+                jsonObject.detector.version = detectorVersion
+            }
+        }
+
+        // Override detector URL
+        if (config.getDetectorUrl()) {
+            const detectorUrl = config.getDetectorUrl()
+            if (detectorUrl) {
+                core.info(`Overriding detector URL from "${jsonObject.detector.url}" to "${detectorUrl}"`)
+                jsonObject.detector.url = detectorUrl
+            }
         }
     }
-    core.info(`Detector name from "${jsonObject.detector.name}"`)
-    core.info(`snapshot before "${jsonObject}"`)
-    core.info(`snapshot after "${jsonObject}"`)
 
     const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', jsonObject)
 
     const relativeJsonFile = getRelativePathFromWorkspace(jsonFile)
     core.notice(`Submitted ${relativeJsonFile}: ${response.data.message}`)
 }
+
 function getReportDirectory(): string {
     return process.env.DEPENDENCY_GRAPH_REPORT_DIR!
 }

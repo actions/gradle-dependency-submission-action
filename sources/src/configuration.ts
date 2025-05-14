@@ -72,7 +72,15 @@ export class DependencyGraphConfig {
     }
 
     getDetectorName(): string | undefined {
-        return getOptionalInput('dependency-graph-detector-name')
+        return getOptionalInput('dependency-graph-detector-name');
+    }
+
+    getDetectorVersion(): string | undefined {
+        return getOptionalInput('dependency-graph-detector-version');
+    }
+
+    getDetectorUrl(): string | undefined {
+        return getOptionalInput('dependency-graph-detector-url');
     }
 
     static constructJobCorrelator(workflow: string, jobId: string, matrixJson: string): string {
