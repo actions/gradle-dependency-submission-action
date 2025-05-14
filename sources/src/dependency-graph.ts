@@ -79,7 +79,7 @@ async function downloadAndSubmitDependencyGraphs(config: DependencyGraphConfig):
     }
 
     try {
-        await submitDependencyGraphs(await downloadDependencyGraphs(config))
+        await submitDependencyGraphs(await downloadDependencyGraphs(config), config)
     } catch (e) {
         warnOrFail(config, DependencyGraphOption.DownloadAndSubmit, e)
     }
