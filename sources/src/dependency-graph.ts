@@ -248,6 +248,24 @@ async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGr
         }
     }
 
+    // Override snapshot SHA if provided
+    if (config && config.getSnapshotSha()) {
+        const snapshotSha = config.getSnapshotSha()
+        if (snapshotSha) {
+            core.info(`Overriding SHA from "${jsonObject.sha}" to "${snapshotSha}"`)
+            jsonObject.sha = snapshotSha
+        }
+    }
+
+    // Override snapshot ref if provided
+    if (config && config.getSnapshotRef()) {
+        const snapshotRef = config.getSnapshotRef()
+        if (snapshotRef) {
+            core.info(`Overriding ref from "${jsonObject.ref}" to "${snapshotRef}"`)
+            jsonObject.ref = snapshotRef
+        }
+    }
+
     const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', jsonObject)
 
     const relativeJsonFile = getRelativePathFromWorkspace(jsonFile)
