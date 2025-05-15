@@ -31,8 +31,8 @@ export async function setup(config: DependencyGraphConfig): Promise<void> {
     maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_CONTINUE_ON_FAILURE', config.getDependencyGraphContinueOnFailure())
     maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_JOB_CORRELATOR', config.getJobCorrelator())
     maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_JOB_ID', github.context.runId.toString())
-    maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_REF', github.context.ref)
-    maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_SHA', getShaFromContext())
+    maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_REF', getRef(config))
+    maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_SHA', getSha(config))
     maybeExportVariable('GITHUB_DEPENDENCY_GRAPH_WORKSPACE', getWorkspaceDirectory())
     maybeExportVariable('DEPENDENCY_GRAPH_REPORT_DIR', config.getReportDirectory())
 
@@ -248,24 +248,6 @@ async function submitDependencyGraphFile(jsonFile: string, config?: DependencyGr
         }
     }
 
-    // Override snapshot SHA if provided
-    if (config && config.getSnapshotSha()) {
-        const snapshotSha = config.getSnapshotSha()
-        if (snapshotSha) {
-            core.info(`Overriding SHA from "${jsonObject.sha}" to "${snapshotSha}"`)
-            jsonObject.sha = snapshotSha
-        }
-    }
-
-    // Override snapshot ref if provided
-    if (config && config.getSnapshotRef()) {
-        const snapshotRef = config.getSnapshotRef()
-        if (snapshotRef) {
-            core.info(`Overriding ref from "${jsonObject.ref}" to "${snapshotRef}"`)
-            jsonObject.ref = snapshotRef
-        }
-    }
-
     const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', jsonObject)
 
     const relativeJsonFile = getRelativePathFromWorkspace(jsonFile)
@@ -303,6 +285,10 @@ function getRelativePathFromWorkspace(file: string): string {
     return path.relative(workspaceDirectory, file)
 }
 
+function getSha(config: DependencyGraphConfig): string {
+    return config.getSnapshotSha() || getShaFromContext()
+}
+
 function getShaFromContext(): string {
     const context = github.context
     const pullRequestEvents = [
@@ -320,6 +306,10 @@ function getShaFromContext(): string {
     } else {
         return context.sha
     }
+}
+
+function getRef(config: DependencyGraphConfig): string {
+    return config.getSnapshotRef() || github.context.ref
 }
 
 function isRunningInActEnvironment(): boolean {
