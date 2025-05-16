@@ -13,53 +13,27 @@ buildscript {
     maven {
       url = "https://jitpack.io"
     }
-    maven {
-      url = pluginRepositoryUrl
-      if (pluginRepositoryUsername && pluginRepositoryPassword) {
-        logger.lifecycle("Applying credentials for plugin repository: ${pluginRepositoryUrl}")
-        credentials {
-          username = pluginRepositoryUsername
-          password = pluginRepositoryPassword
-        }
-        authentication {
-          basic(BasicAuthentication)
-        }
-      }
-    }
+    // maven {
+    //   url = pluginRepositoryUrl
+    //   if (pluginRepositoryUsername && pluginRepositoryPassword) {
+    //     logger.lifecycle("Applying credentials for plugin repository: ${pluginRepositoryUrl}")
+    //     credentials {
+    //       username = pluginRepositoryUsername
+    //       password = pluginRepositoryPassword
+    //     }
+    //     authentication {
+    //       basic(BasicAuthentication)
+    //     }
+    //   }
+    // }
 
-    maven {
-      url = "https://jitpack.io"
-    }
+    // maven {
+    //   url = "https://jitpack.io"
+    // }
   }
   dependencies {
-    // classpath "org.gradle:github-dependency-graph-gradle-plugin:${dependencyGraphPluginVersion}"
-    // classpath "com.github.ljones140.github-dependency-graph-gradle-plugin:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-20d684b171-1"
     classpath "com.github.ljones140:github-dependency-graph-gradle-plugin:20d684b171"
   }
 }
-
-// // apply plugin: org.gradle.github.GitHubDependencyGraphPlugin
-// buildscript {
-//   def getInputParam = { String name ->
-//       def envVarName = name.toUpperCase().replace('.', '_').replace('-', '_')
-//       return System.getProperty(name) ?: System.getenv(envVarName)
-//   }
-
-//   repositories {
-//     maven {
-//       url = "https://jitpack.io"
-//     }
-//   maven {
-//       url = getInputParam('gradle.plugin-repository.url') ?: 'https://plugins.gradle.org/m2'
-//       // Original credential code...
-//     }
-//   }
-
-//   dependencies {
-//     // Using JitPack to fetch specific commit from GitHub
-
-//     implementation "com.github.ljones140:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-SNAPSHOT"
-//   }
-// }
 
 apply plugin: org.gradle.github.GitHubDependencyGraphPlugin
