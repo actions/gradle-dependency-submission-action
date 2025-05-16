@@ -8,24 +8,14 @@ buildscript {
   def pluginRepositoryPassword = getInputParam('gradle.plugin-repository.password')
   def dependencyGraphPluginVersion = getInputParam('dependency-graph-plugin.version') ?: '1.3.2'
 
-  logger.lifecycle("Resolving dependency graph plugin ${dependencyGraphPluginVersion} from plugin repository: ${pluginRepositoryUrl}")
+  logger.lifecycle("Resolving dependency graph plugin")
   repositories {
-    maven { 
-      url = pluginRepositoryUrl
-      if (pluginRepositoryUsername && pluginRepositoryPassword) {
-        logger.lifecycle("Applying credentials for plugin repository: ${pluginRepositoryUrl}")
-        credentials {
-          username = pluginRepositoryUsername
-          password = pluginRepositoryPassword
-        }
-        authentication {
-          basic(BasicAuthentication)
-        }
-      }
+    maven {
+      url = "https://jitpack.io"
     }
   }
   dependencies {
-    classpath "org.gradle:github-dependency-graph-gradle-plugin:${dependencyGraphPluginVersion}"
+    classpath "com.github.ljones140:github-dependency-graph-gradle-plugin:20d684b171"
   }
 }
 
