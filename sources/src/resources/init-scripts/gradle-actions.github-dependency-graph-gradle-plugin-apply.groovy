@@ -45,7 +45,7 @@ buildscript {
   dependencies {
     // Using JitPack to fetch specific commit from GitHub
 
-    classpath "com.github.ljones140:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-SNAPSHOT"
+    implementation "com.github.ljones140:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-SNAPSHOT"
   }
 }
 
