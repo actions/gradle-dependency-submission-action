@@ -33,7 +33,8 @@ buildscript {
   }
   dependencies {
     // classpath "org.gradle:github-dependency-graph-gradle-plugin:${dependencyGraphPluginVersion}"
-    classpath "com.github.ljones140.github-dependency-graph-gradle-plugin:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-20d684b171-1"
+    // classpath "com.github.ljones140.github-dependency-graph-gradle-plugin:github-dependency-graph-gradle-plugin:dependency-graph-detector-configurable-20d684b171-1"
+    classpath "com.github.ljones140:github-dependency-graph-gradle-plugin:20d684b171"
   }
 }
 
